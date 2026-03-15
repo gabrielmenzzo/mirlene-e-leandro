@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Logo } from "@/components/wedding/Logo"
 import { Arabesque } from "@/components/wedding/Arabesque"
@@ -17,7 +18,7 @@ const GIFTS: GiftItem[] = [
     name: "Conjunto de Panelas Tramontina Premium",
     description: "Para prepararmos refeições deliciosas juntos.",
     price: 450.0,
-    imageUrl: "https://images.unsplash.com/photo-1584990347449-a6eb1eb3a929?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/panelas.webp",
     badge: "Mais desejado ✨",
   },
   {
@@ -32,7 +33,7 @@ const GIFTS: GiftItem[] = [
     name: "Cafeteira Expresso Nespresso",
     description: "Para os cafés da manhã preguiçosos de domingo.",
     price: 650.0,
-    imageUrl: "https://images.unsplash.com/photo-1517246281036-e18c0f73f4e3?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/cafeteira.webp",
     badge: "Escolha especial 💛",
   },
   {
@@ -82,7 +83,7 @@ const GIFTS: GiftItem[] = [
     name: "Robô Aspirador",
     description: "Para nos ajudar a manter a casa sempre limpa.",
     price: 1200.0,
-    imageUrl: "https://images.unsplash.com/photo-1589824783837-6169889fd20c?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/robo.webp",
   },
   {
     id: "g11",
@@ -96,6 +97,139 @@ const GIFTS: GiftItem[] = [
     name: "Conjunto de Facas Wüsthof",
     description: "Precisão e qualidade para a nossa cozinha.",
     price: 420.0,
+    imageUrl: "https://images.unsplash.com/photo-1593618998160-e34014e67546?auto=format&fit=crop&q=80&w=800",
+  },
+  {
+    id: "g13",
+    name: "Jogo de Cama Queen",
+    description: "Para noites de sono confortáveis com a delicadeza que merecemos.",
+    price: 85.99,
+    imageUrl: "/images/jogo_cama_queen.webp",
+  },
+  {
+    id: "g14",
+    name: "Assadeira de Vidro Quadrada",
+    description: "Perfeita para preparar nossas sobremesas e assados favoritos.",
+    price: 52.98,
+    imageUrl: "/images/assadeira_vidro.webp",
+  },
+  {
+    id: "g15",
+    name: "Jogo de Facas 3 Peças Tramontina",
+    description: "Para dar um toque chef nas nossas refeições do dia a dia.",
+    price: 54.99,
+    imageUrl: "/images/jogo_facas_3.webp",
+  },
+  {
+    id: "g16",
+    name: "Frigideira Antiaderente Tramontina de Alumínio",
+    description: "Nossa aliada para preparar pratos deliciosos e práticos.",
+    price: 65.99,
+    imageUrl: "/images/frigideira_antiaderente.webp",
+  },
+  {
+    id: "g17",
+    name: "Jogo de Taças para Vinho de Vidro 4 Peças",
+    description: "Para brindarmos juntos os bons momentos.",
+    price: 79.99,
+    imageUrl: "/images/tacas_vinho.webp",
+  },
+  {
+    id: "g18",
+    name: "Jogo de Taças para Champanhe de Vidro 4 Peças",
+    description: "Para celebrarmos todas as nossas futuras conquistas.",
+    price: 69.99,
+    imageUrl: "/images/tacas_champanhe.webp",
+  },
+  {
+    id: "g19",
+    name: "Petisqueira de Vidro Redonda",
+    description: "Para recebermos amigos em casa com muito charme.",
+    price: 59.99,
+    imageUrl: "/images/petisqueira_vidro.webp",
+  },
+  {
+    id: "g20",
+    name: "Bule Haus 1 Litro",
+    description: "Para aquecer nossos corações nos cafés e chás da tarde.",
+    price: 49.99,
+    imageUrl: "/images/bule_haus.webp",
+  },
+  {
+    id: "g21",
+    name: "Conjunto Trinchante Tramontina Inox Plenus 2 Peças",
+    description: "Praticidade e elegância para os nossos tradicionais assados.",
+    price: 87.98,
+    imageUrl: "/images/conjunto_trinchante.webp",
+  },
+  {
+    id: "g22",
+    name: "Açucareiro de Vidro com Colher Hauskraft Graffiato",
+    description: "O detalhe doce e sofisticado para a nossa mesa posta.",
+    price: 53.45,
+    imageUrl: "/images/acucareiro.webp",
+  },
+  {
+    id: "g23",
+    name: "Espremedor de Frutas Mondial E-02 Premium",
+    description: "Para começarmos o dia com aquele suco fresquinho.",
+    price: 149.99,
+    imageUrl: "/images/espremedor_frutas.webp",
+  },
+  {
+    id: "g24",
+    name: "Jogo de Potes de Plástico Herméticos Electrolux 12 Peças",
+    description: "Ajudinha extra para mantermos nossa geladeira sempre organizada.",
+    price: 115.90,
+    imageUrl: "/images/potes_plastico.webp",
+  },
+  {
+    id: "g25",
+    name: "Jogo de Potes Hermético Electrolux Bambu 2 Peças",
+    description: "O charme e a praticidade perfeitos para a nossa despensa.",
+    price: 132.00,
+    imageUrl: "/images/potes_bambu.webp",
+  },
+  {
+    id: "g26",
+    name: "Porta-Papel Toalha de Mesa Inox Hauskraft",
+    description: "Organização com estilo moderno para nossa cozinha.",
+    price: 77.49,
+    imageUrl: "/images/porta_papel.webp",
+  },
+  {
+    id: "g27",
+    name: "Sanduicheira Mondial Fast Grill S-12",
+    description: "Para prepararmos os lanches rápidos que tanto amamos.",
+    price: 119.99,
+    imageUrl: "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&q=80&w=800",
+  },
+  {
+    id: "g28",
+    name: "Jogo de Pratos Redondo de Porcelana Branco 6 peças",
+    description: "Para servirmos nossos jantares em grande estilo.",
+    price: 225.99,
+    imageUrl: "https://images.unsplash.com/photo-1615876234886-fd9a39fda97f?auto=format&fit=crop&q=80&w=800",
+  },
+  {
+    id: "g29",
+    name: "Kit de Toalhas Banho e Rosto",
+    description: "O conforto e maciez pós-banho que toda casa precisa.",
+    price: 159.99,
+    imageUrl: "https://images.unsplash.com/photo-1616627561950-9f746e330187?auto=format&fit=crop&q=80&w=800",
+  },
+  {
+    id: "g30",
+    name: "Petisqueira Porcelana com Pote Retangular 4 Peças Tramontina Teca",
+    description: "Para noites de vinho e queijos com amigos especiais.",
+    price: 177.59,
+    imageUrl: "/images/petisqueira_vidro.webp",
+  },
+  {
+    id: "g31",
+    name: "Jogo De Facas Inox 9 Peças Plenus Preto Tramontina",
+    description: "Um kit completo para todas as nossas aventuras culinárias.",
+    price: 176.99,
     imageUrl: "https://images.unsplash.com/photo-1593618998160-e34014e67546?auto=format&fit=crop&q=80&w=800",
   },
 ]
@@ -147,7 +281,7 @@ export default function Presentes() {
           href="/"
           className="text-wedding-primary font-cormorant text-lg italic hover:text-wedding-secondary transition-colors border-b border-transparent hover:border-wedding-secondary"
         >
-          &larr; Voltar para o Convite
+          &larr; Confirmar presença
         </Link>
       </nav>
 
@@ -175,13 +309,31 @@ export default function Presentes() {
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-12 text-center relative z-10 bg-wedding-muted/30">
+      <footer className="w-full pt-12 pb-6 text-center relative z-10 bg-wedding-muted/30 flex flex-col items-center">
         <p className="font-great-vibes text-3xl text-wedding-primary mb-2">
           #MirleneELeandro2026
         </p>
-        <p className="text-xs text-wedding-secondary/60 font-lato uppercase tracking-widest">
+        <p className="text-xs text-wedding-secondary/60 font-lato uppercase tracking-widest mb-12">
           Com amor, Mirlene & Leandro
         </p>
+
+        <div className="flex items-center justify-center gap-1.5 mt-8 text-[11px] text-wedding-secondary/80 font-lato">
+          <span>Site desenvolvido por:</span>
+          <a 
+            href="https://menzzo.com.br" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:opacity-80 transition-opacity flex items-center"
+          >
+            <Image 
+              src="/images/logo-menzzo.svg" 
+              alt="Menzzo" 
+              width={60} 
+              height={14} 
+              className="h-3 w-auto object-contain"
+            />
+          </a>
+        </div>
       </footer>
 
       <GiftModal

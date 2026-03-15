@@ -4,8 +4,10 @@ import { Arabesque } from "@/components/wedding/Arabesque"
 import { CountdownTimer } from "@/components/wedding/CountdownTimer"
 import { RSVPForm } from "@/components/wedding/RSVPForm"
 import { PolaroidGallery } from "@/components/wedding/PolaroidGallery"
+import { OurStory } from "@/components/wedding/OurStory"
 import { Calendar, Clock, MapPin } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function Home() {
   return (
@@ -34,32 +36,39 @@ export default function Home() {
 
         <Arabesque className="mb-12 w-48 md:w-64" />
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-16 text-wedding-text font-lato">
-          <div className="flex items-center gap-3">
-            <Calendar className="w-5 h-5 text-wedding-primary" />
-            <span className="text-lg tracking-wide">03 de Outubro de 2026</span>
+        <div className="w-full flex flex-col md:flex-row items-start justify-between gap-8 md:gap-0 mb-16 text-wedding-text font-lato">
+          <div className="flex-1 flex flex-col items-center gap-3 text-center px-4">
+            <Calendar className="w-6 h-6 text-wedding-primary" />
+            <span className="text-base md:text-lg tracking-wide font-medium">03 de Outubro de<br />2026</span>
           </div>
-          <div className="hidden md:block w-px h-8 bg-wedding-primary/30" />
-          <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5 text-wedding-primary" />
-            <span className="text-lg tracking-wide">10:00h</span>
+          
+          <div className="hidden md:block w-px h-16 bg-wedding-primary/30 mt-2 shrink-0" />
+          
+          <div className="flex-1 flex flex-col items-center gap-3 text-center px-4">
+            <Clock className="w-6 h-6 text-wedding-primary" />
+            <span className="text-base md:text-lg tracking-wide font-medium">10:00h</span>
           </div>
-          <div className="hidden md:block w-px h-8 bg-wedding-primary/30" />
-          <div className="flex items-center gap-3">
-            <MapPin className="w-5 h-5 text-wedding-primary flex-shrink-0" />
+          
+          <div className="hidden md:block w-px h-16 bg-wedding-primary/30 mt-2 shrink-0" />
+          
+          <div className="flex-1 flex flex-col items-center gap-3 text-center px-4">
+            <MapPin className="w-6 h-6 text-wedding-primary flex-shrink-0" />
             <a 
               href="https://maps.app.goo.gl/gHUq1HS8uHat9BDe8" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-lg tracking-wide hover:text-wedding-primary transition-colors hover:underline underline-offset-4"
+              className="text-base md:text-lg tracking-wide hover:text-wedding-primary transition-colors hover:underline underline-offset-4 font-medium"
             >
-              Av. Sebastião Jorge Lasmar - Formiga, MG, 35570-000
+              Av. Sebastião Jorge Lasmar -<br />Formiga, MG,<br />35570-000
             </a>
           </div>
         </div>
 
         <CountdownTimer />
       </section>
+
+      {/* Our Story Section */}
+      <OurStory />
 
       {/* RSVP Section */}
       <section className="w-full px-4 py-20 relative z-10 bg-gradient-to-b from-transparent via-wedding-muted/30 to-transparent">
@@ -71,13 +80,31 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-12 text-center relative z-10">
+      <footer className="w-full pt-12 pb-6 text-center relative z-10 flex flex-col items-center">
         <p className="font-great-vibes text-3xl text-wedding-primary mb-2">
           #MirleneELeandro2026
         </p>
-        <p className="text-xs text-wedding-secondary/60 font-lato uppercase tracking-widest">
+        <p className="text-xs text-wedding-secondary/60 font-lato uppercase tracking-widest mb-12">
           Com amor, Mirlene & Leandro
         </p>
+
+        <div className="flex items-center justify-center gap-1.5 mt-8 text-[11px] text-wedding-secondary/80 font-lato">
+          <span>Site desenvolvido por:</span>
+          <a 
+            href="https://menzzo.com.br" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:opacity-80 transition-opacity flex items-center"
+          >
+            <Image 
+              src="/images/logo-menzzo.svg" 
+              alt="Menzzo" 
+              width={60} 
+              height={14} 
+              className="h-3 w-auto object-contain"
+            />
+          </a>
+        </div>
       </footer>
     </main>
   )
