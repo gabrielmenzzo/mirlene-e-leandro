@@ -75,7 +75,7 @@ export function GiftCard({ gift, onGiftClick }: GiftCardProps) {
 
         <CardFooter className="p-6 pt-0">
           <Button
-            className="w-full group/btn"
+            className="w-full group/btn cursor-pointer"
             onClick={() => onGiftClick(gift)}
             disabled={gift.isReserved}
           >

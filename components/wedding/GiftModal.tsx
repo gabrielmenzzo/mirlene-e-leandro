@@ -3,7 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
-import { CheckCircle2, Copy, Heart, Sparkles, Users } from "lucide-react"
+import { CheckCircle2, Heart, Sparkles, Users } from "lucide-react"
 
 import {
   Dialog,
@@ -13,8 +13,8 @@ import {
   DialogDescription,
 } from "@/components/ui/Modal"
 import { Button } from "@/components/ui/Button"
-import { Input } from "@/components/ui/Input"
 import { GiftItem } from "./GiftCard"
+import CheckoutForm from "./CheckoutForm"
 
 interface GiftModalProps {
   gift: GiftItem | null
@@ -29,14 +29,14 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
   const [step, setStep] = React.useState<Step>("confirm")
   const [bumpAccepted, setBumpAccepted] = React.useState(false)
   const [socialProof] = React.useState(() => Math.floor(Math.random() * 7) + 2)
-  const [copied, setCopied] = React.useState(false)
+  const [paymentError, setPaymentError] = React.useState<string | null>(null)
 
   // Reset state when modal opens/closes
   React.useEffect(() => {
     if (isOpen) {
       setStep("confirm")
       setBumpAccepted(false)
-      setCopied(false)
+      setPaymentError(null)
     }
   }, [isOpen])
 
@@ -45,12 +45,13 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(price)
 
-  const handleConfirm = () => setStep("bump")
+  const handleConfirm = () => setStep("payment")
   const handleBump = (accept: boolean) => {
     setBumpAccepted(accept)
     setStep("payment")
   }
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = (paymentId: string) => {
+    console.log("Payment successful:", paymentId)
     setStep("success")
     setTimeout(() => {
       onSuccess(gift.id)
@@ -58,10 +59,8 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
     }, 2500)
   }
 
-  const copyPix = () => {
-    navigator.clipboard.writeText("00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-4266141740005204000053039865802BR5925Mirlene e Leandro Casamento6009Sao Paulo62070503***63041234")
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const handlePaymentError = (error: string) => {
+    setPaymentError(error)
   }
 
   // Calculate bump logic
@@ -92,6 +91,7 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md overflow-hidden">
+        <DialogTitle className="sr-only">Presentear</DialogTitle>
         <AnimatePresence mode="wait">
           {step === "confirm" && (
             <motion.div
@@ -101,12 +101,14 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
               exit={{ opacity: 0, x: -20 }}
               className="flex flex-col items-center text-center space-y-6"
             >
-              <DialogHeader>
-                <DialogTitle className="text-2xl text-wedding-text">Confirmar Presente</DialogTitle>
-                <DialogDescription>
+              <div className="text-center">
+                <h2 className="text-2xl font-cormorant font-semibold text-wedding-text">
+                  Confirmar Presente
+                </h2>
+                <p className="text-wedding-secondary mt-1">
                   Você está prestes a presentear os noivos com:
-                </DialogDescription>
-              </DialogHeader>
+                </p>
+              </div>
 
               <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-wedding-primary/20 shadow-md">
                 <Image src={gift.imageUrl} alt={gift.name} fill className="object-cover" />
@@ -122,10 +124,10 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
               </div>
 
               <div className="w-full flex flex-col gap-3 pt-4">
-                <Button onClick={handleConfirm} className="w-full text-lg h-14">
+                <Button onClick={handleConfirm} className="w-full text-lg h-14 cursor-pointer">
                   Confirmar este presente
                 </Button>
-                <Button variant="ghost" onClick={onClose}>
+                <Button variant="ghost" onClick={onClose} className="cursor-pointer">
                   Cancelar
                 </Button>
               </div>
@@ -173,10 +175,10 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
               </div>
 
               <div className="w-full flex flex-col gap-3">
-                <Button onClick={() => handleBump(true)} className="w-full text-lg h-14 bg-wedding-primary hover:bg-wedding-primary/90 shadow-lg shadow-wedding-primary/20 animate-pulse">
+                <Button onClick={() => handleBump(true)} className="w-full text-lg h-14 bg-wedding-primary hover:bg-wedding-primary/90 shadow-lg shadow-wedding-primary/20 animate-pulse cursor-pointer">
                   Sim, quero presentear ainda mais! 💝
                 </Button>
-                <Button variant="outline" onClick={() => handleBump(false)}>
+                <Button variant="outline" onClick={() => handleBump(false)} className="cursor-pointer">
                   Não, obrigado. Manter apenas o presente.
                 </Button>
               </div>
@@ -192,47 +194,25 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
               className="flex flex-col space-y-5"
             >
               <DialogHeader className="text-center sm:text-center">
-                <DialogTitle className="text-2xl text-wedding-text">Pagamento PIX</DialogTitle>
+                <DialogTitle className="text-2xl text-wedding-text">Pagamento Seguro</DialogTitle>
                 <DialogDescription>
-                  Total a pagar: <span className="font-semibold text-wedding-primary">{formatPrice(finalPrice)}</span>
+                  Total: <span className="font-semibold text-wedding-primary">{formatPrice(finalPrice)}</span>
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-wedding-text">Seu Nome</label>
-                  <Input placeholder="Como os noivos devem te agradecer?" />
+              {paymentError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {paymentError}
                 </div>
-                
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-wedding-text">Mensagem aos Noivos</label>
-                  <textarea 
-                    className="flex w-full rounded-md border border-wedding-secondary/30 bg-white/50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wedding-primary resize-none"
-                    rows={3}
-                    placeholder="Deixe uma mensagem carinhosa..."
-                    maxLength={200}
-                  />
-                </div>
+              )}
 
-                <div className="bg-wedding-muted/50 rounded-xl p-6 flex flex-col items-center justify-center border border-wedding-secondary/20">
-                  <div className="w-40 h-40 bg-white rounded-lg shadow-sm border border-wedding-secondary/10 flex items-center justify-center mb-4 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg')] bg-contain bg-center opacity-20 filter blur-[1px]"></div>
-                    <div className="relative z-10 text-center px-4">
-                      <p className="text-xs font-medium text-wedding-secondary mb-1">Integração Mercado Pago</p>
-                      <p className="text-xs text-wedding-secondary/70">Em breve</p>
-                    </div>
-                  </div>
-                  
-                  <Button variant="outline" className="w-full flex items-center gap-2" onClick={copyPix}>
-                    {copied ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                    {copied ? "Chave Copiada!" : "Copiar Chave PIX"}
-                  </Button>
-                </div>
-              </div>
-
-              <Button onClick={handlePaymentSuccess} className="w-full h-14 text-lg bg-green-600 hover:bg-green-700 text-white">
-                Já realizei o pagamento ✅
-              </Button>
+              <CheckoutForm
+                giftName={gift.name}
+                giftPrice={finalPrice}
+                onSuccess={handlePaymentSuccess}
+                onError={handlePaymentError}
+                onBack={() => setStep("confirm")}
+              />
             </motion.div>
           )}
 
