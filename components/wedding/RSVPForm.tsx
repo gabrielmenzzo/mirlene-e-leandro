@@ -4,7 +4,8 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { motion } from "motion/react"
 import confetti from "canvas-confetti"
-import { Heart } from "lucide-react"
+import { Heart, Gift } from "lucide-react"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
@@ -16,10 +17,20 @@ type RSVPFormData = {
   attending: "yes" | "no"
 }
 
+/** Client-side sanitisation — defence-in-depth (server also sanitises) */
+function sanitizeInput(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/[<>"'`]/g, "")
+    .trim()
+}
+
 export function RSVPForm() {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isSuccess, setIsSuccess] = React.useState(false)
   const [submittedName, setSubmittedName] = React.useState("")
+  const [submittedAttending, setSubmittedAttending] = React.useState<"yes" | "no">("yes")
+  const [errorMessage, setErrorMessage] = React.useState("")
 
   const {
     register,
@@ -40,22 +51,49 @@ export function RSVPForm() {
 
   const onSubmit = async (data: RSVPFormData) => {
     setIsSubmitting(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsSubmitting(false)
-    setIsSuccess(true)
-    setSubmittedName(data.name.split(" ")[0])
+    setErrorMessage("")
 
-    if (data.attending === "yes") {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ["#B89C6D", "#E6D5B8", "#8A7B66"],
-      })
+    // Client-side sanitisation
+    const sanitizedData = {
+      name: sanitizeInput(data.name),
+      phone: sanitizeInput(data.phone),
+      attending: data.attending === "yes" ? "yes" : "no",
     }
 
-    reset()
+    try {
+      const res = await fetch("/api/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sanitizedData),
+      })
+
+      const result = await res.json()
+
+      if (!res.ok) {
+        setErrorMessage(result.error || "Erro ao enviar. Tente novamente.")
+        setIsSubmitting(false)
+        return
+      }
+
+      setSubmittedName(sanitizedData.name.split(" ")[0])
+      setSubmittedAttending(sanitizedData.attending as "yes" | "no")
+      setIsSuccess(true)
+
+      if (sanitizedData.attending === "yes") {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#B89C6D", "#E6D5B8", "#8A7B66"],
+        })
+      }
+
+      reset()
+    } catch {
+      setErrorMessage("Erro de conexão. Verifique sua internet e tente novamente.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isSuccess) {
@@ -74,15 +112,19 @@ export function RSVPForm() {
               Obrigado, {submittedName}!
             </h3>
             <p className="text-wedding-secondary">
-              Sua resposta foi registrada com sucesso.
+              {submittedAttending === "yes"
+                ? "Confira abaixo a lista de presentes do casal."
+                : "Sua resposta foi registrada. Sentiremos sua falta!"}
             </p>
-            <Button
-              variant="outline"
-              className="mt-6"
-              onClick={() => setIsSuccess(false)}
-            >
-              Enviar outra resposta
-            </Button>
+            <Link href="/presente" className="mt-6 inline-block">
+              <Button
+                variant="default"
+                className="cursor-pointer group"
+              >
+                <Gift className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
+                Ver Lista de Presentes
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </motion.div>
@@ -104,7 +146,7 @@ export function RSVPForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             <div className="space-y-1">
               <label htmlFor="name" className="text-sm font-medium text-wedding-text">
                 Nome completo *
@@ -112,7 +154,14 @@ export function RSVPForm() {
               <Input
                 id="name"
                 placeholder="Ex: Maria Silva"
-                {...register("name", { required: "Nome é obrigatório" })}
+                autoComplete="name"
+                {...register("name", {
+                  required: "Nome é obrigatório",
+                  minLength: { value: 2, message: "Nome deve ter pelo menos 2 caracteres" },
+                  maxLength: { value: 120, message: "Nome deve ter no máximo 120 caracteres" },
+                  validate: (v) =>
+                    sanitizeInput(v).length >= 2 || "Nome inválido",
+                })}
                 className={errors.name ? "border-red-500" : ""}
               />
               {errors.name && (
@@ -127,8 +176,14 @@ export function RSVPForm() {
               <Input
                 id="phone"
                 placeholder="(00) 00000-0000"
+                inputMode="tel"
+                autoComplete="tel"
                 {...register("phone", { 
                   required: "Telefone é obrigatório",
+                  validate: (v) => {
+                    const digits = v.replace(/\D/g, "")
+                    return (digits.length >= 10 && digits.length <= 11) || "Número de telefone inválido"
+                  },
                   onChange: (e) => {
                     e.target.value = formatPhone(e.target.value)
                   }
@@ -170,13 +225,29 @@ export function RSVPForm() {
               )}
             </div>
 
+            {errorMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md px-4 py-3"
+              >
+                {errorMessage}
+              </motion.div>
+            )}
+
             <Button
               type="submit"
-              className="w-full mt-4 group"
+              className="w-full mt-4 group cursor-pointer"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                "Enviando..."
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Enviando...
+                </span>
               ) : (
                 <>
                   Confirmar Presença

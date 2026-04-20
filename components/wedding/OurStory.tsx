@@ -3,9 +3,58 @@
 import * as React from "react"
 import { Volume2, VolumeX } from "lucide-react"
 
-export function OurStory() {
+interface OurStoryProps {
+  hasUserInteracted?: boolean
+}
+
+export function OurStory({ hasUserInteracted = false }: OurStoryProps) {
   const videoRef = React.useRef<HTMLVideoElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
   const [isMuted, setIsMuted] = React.useState(true)
+
+  // When user enters (clicks WelcomeOverlay), start video with audio
+  React.useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (hasUserInteracted) {
+      // User clicked "Entrar" — browser now allows audio
+      video.muted = false
+      setIsMuted(false)
+      video.play().catch(() => {
+        // Edge case: still blocked — fallback to muted
+        video.muted = true
+        setIsMuted(true)
+        video.play().catch(() => {})
+      })
+    } else {
+      // No interaction yet — start muted to ensure video plays
+      video.muted = true
+      setIsMuted(true)
+      video.play().catch(() => {})
+    }
+  }, [hasUserInteracted])
+
+  // IntersectionObserver: pause when off-screen, play when visible (saves CPU/battery)
+  React.useEffect(() => {
+    const video = videoRef.current
+    const container = containerRef.current
+    if (!video || !container) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {})
+        } else {
+          video.pause()
+        }
+      },
+      { threshold: 0.25 }
+    )
+
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -18,14 +67,14 @@ export function OurStory() {
     <section className="w-full max-w-4xl mx-auto px-6 py-16 flex flex-col items-center text-center relative z-10">
       
       {/* Video Player (Vertical) */}
-      <div className="relative w-full max-w-sm aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl mb-12 bg-wedding-muted/20 border border-wedding-secondary/20">
+      <div ref={containerRef} className="relative w-full max-w-sm aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl mb-12 bg-wedding-muted/20 border border-wedding-secondary/20">
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
-          autoPlay
-          muted={isMuted} // Starts muted so autoplay actually works on modern browsers
+          muted
           loop
           playsInline
+          preload="metadata"
         >
           <source src="/images/video-hero.mp4" type="video/mp4" />
           Seu navegador não suporta o elemento de vídeo.
