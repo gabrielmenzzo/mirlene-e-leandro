@@ -18,7 +18,7 @@ const ORIGINAL_GIFTS: GiftItem[] = [
     name: "Smart TV 43\"",
     description: "Para nossas maratonas de séries e filmes.",
     price: 1800.0,
-    imageUrl: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g9.webp",
     badge: "Mais desejado ✨",
   },
   {
@@ -26,7 +26,7 @@ const ORIGINAL_GIFTS: GiftItem[] = [
     name: "KitchenAid Stand Mixer",
     description: "Para as receitas mais elaboradas e deliciosas.",
     price: 1500.0,
-    imageUrl: "https://images.unsplash.com/photo-1593504049359-74330189a345?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g11.webp",
   },
   {
     id: "g3",
@@ -40,7 +40,7 @@ const ORIGINAL_GIFTS: GiftItem[] = [
     name: "Adega Climatizada",
     description: "Para brindarmos os momentos inesquecíveis.",
     price: 890.0,
-    imageUrl: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g7.webp",
   },
   {
     id: "g5",
@@ -62,56 +62,56 @@ const ORIGINAL_GIFTS: GiftItem[] = [
     name: "Conjunto de Facas Wüsthof",
     description: "Precisão e qualidade para a nossa cozinha.",
     price: 420.0,
-    imageUrl: "https://images.unsplash.com/photo-1593618998160-e34014e67546?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g12.webp",
   },
   {
     id: "g8",
     name: "Aparelho de Jantar 42 peças",
     description: "Para recebermos amigos e familiares com elegância.",
     price: 380.0,
-    imageUrl: "https://images.unsplash.com/photo-1615876234886-fd9a39fda97f?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g6.webp",
   },
   {
     id: "g9",
     name: "Jogo de Cama King Plumasul",
     description: "Para noites de sono tranquilas e aconchegantes.",
     price: 320.0,
-    imageUrl: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g4.webp",
   },
   {
     id: "g10",
     name: "Micro-ondas Philco Flat 30L",
     description: "Para aquecer rapidamente nossas refeições e facilitar o dia a dia na cozinha.",
     price: 599.0,
-    imageUrl: "/images/microondas.webp",
+    imageUrl: "/images/gifts/g10.webp",
   },
   {
     id: "g11",
     name: "Jogo de Pratos Redondo de Porcelana Branco 6 peças",
     description: "Para servirmos nossos jantares em grande estilo.",
     price: 225.99,
-    imageUrl: "https://images.unsplash.com/photo-1615876234886-fd9a39fda97f?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g6.webp",
   },
   {
     id: "g12",
     name: "Liquidificador Mondial Premium",
     description: "Para sucos, vitaminas e receitas especiais.",
     price: 220.0,
-    imageUrl: "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g5.webp",
   },
   {
     id: "g13",
     name: "Kit Vinho + Taças Personalizadas",
     description: "O complemento perfeito para a nossa adega.",
     price: 250.0,
-    imageUrl: "https://images.unsplash.com/photo-1585553616435-2dc0a54e271d?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g8.webp",
   },
   {
     id: "g14",
     name: "Jogo de Toalhas Bordadas",
     description: "Conforto e maciez para o nosso dia a dia.",
     price: 180.0,
-    imageUrl: "https://images.unsplash.com/photo-1616627561950-9f746e330187?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g2.webp",
   },
   {
     id: "g15",
@@ -125,7 +125,7 @@ const ORIGINAL_GIFTS: GiftItem[] = [
     name: "Jogo De Facas Inox 9 Peças Plenus Preto Tramontina",
     description: "Um kit completo para todas as nossas aventuras culinárias.",
     price: 176.99,
-    imageUrl: "https://images.unsplash.com/photo-1593618998160-e34014e67546?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/jogo_facas_3.webp",
   },
   {
     id: "g17",
@@ -146,14 +146,14 @@ const ORIGINAL_GIFTS: GiftItem[] = [
     name: "Kit de Toalhas Banho e Rosto",
     description: "O conforto e maciez pós-banho que toda casa precisa.",
     price: 159.99,
-    imageUrl: "https://images.unsplash.com/photo-1616627561950-9f746e330187?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g2.webp",
   },
   {
     id: "g20",
     name: "Sanduicheira Mondial Fast Grill S-12",
     description: "Para prepararmos os lanches rápidos que tanto amamos.",
     price: 119.99,
-    imageUrl: "https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/g5.webp",
   },
   {
     id: "g21",
@@ -247,112 +247,112 @@ const NEW_GIFTS: GiftItem[] = [
     name: "☕ Café para o noivo acordar de bom humor",
     description: "Para começar o dia com o pé direito.",
     price: 50.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n1.webp",
   },
   {
     id: "ng2",
     name: "🍫 Chocolate para evitar DR",
     description: "O segredo para uma relação doce.",
     price: 60.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/chocolate.webp",
   },
   {
     id: "ng3",
     name: "🧦 Meias do noivo que sempre desaparecem",
     description: "Para nunca mais ter meias orphan.",
     price: 70.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n3.webp",
   },
   {
     id: "ng4",
     name: "🍿 Pipoca para nossas noites de série",
     description: "O acompanhamento perfeito para maratonas.",
     price: 80.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/pipoca.webp",
   },
   {
     id: "ng5",
     name: "🍕 Pizza para quando ninguém quiser cozinhar",
     description: "A solução para os dias de preguiça.",
     price: 90.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n5.webp",
   },
   {
     id: "ng6",
     name: "🧹 Ajuda para manter a casa organizada",
     description: "Um pouco de ajuda nunca é demais.",
     price: 100.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n6.webp",
   },
   {
     id: "ng7",
     name: "🧺 Fundo lavanderia infinita",
     description: "Porque a roupa nunca acaba.",
     price: 120.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n7.webp",
   },
   {
     id: "ng8",
     name: "🧘 Fundo da paciência do casal",
     description: "Investimento no nosso equilíbrio.",
     price: 150.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n8.webp",
   },
   {
     id: "ng9",
     name: "🌭 Lanche da madrugada do casal",
     description: "Para os dias de movie night.",
     price: 160.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n9.webp",
   },
   {
     id: "ng10",
     name: "🛋 Contribuição para nosso descanso no sofá",
     description: "Para relaxar juntos após o trabalho.",
     price: 180.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n10.webp",
   },
   {
     id: "ng11",
     name: "🚗 Gasolina para visitar a sogra",
     description: "O combustível do amor familiar.",
     price: 200.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n11.webp",
   },
   {
     id: "ng12",
     name: "🍷 Vinho para comemorar que sobrevivemos ao casamento",
     description: "Brinde final merecido.",
     price: 220.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n12.webp",
   },
   {
     id: "ng13",
     name: "🛒 Compras do mês (socorro!)",
     description: "A ajuda que toda casa nova precisa.",
     price: 250.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n13.webp",
   },
   {
     id: "ng14",
     name: "✈️ Ajuda para fugir na lua de mel",
     description: "Para o merecido descanso pós-casamento.",
     price: 300.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n14.webp",
   },
   {
     id: "ng15",
     name: "💸 Fundo casados e agora?",
     description: "Para os primeiros passos da nova fase.",
     price: 350.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n15.webp",
   },
   {
     id: "ng16",
     name: "😂 Terapia de casal preventiva",
     description: "Porque prevenção é o melhor remédio.",
     price: 400.0,
-    imageUrl: "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800",
+    imageUrl: "/images/gifts/n16.webp",
   },
 ]
 
@@ -385,17 +385,7 @@ export default function Presentes() {
   const [selectedGift, setSelectedGift] = React.useState<GiftItem | null>(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 
-  // Load reserved gifts from localStorage on mount
-  React.useEffect(() => {
-    const reservedGifts = JSON.parse(localStorage.getItem("reservedGifts") || "[]")
-    if (reservedGifts.length > 0) {
-      setGifts((prevGifts) =>
-        prevGifts.map((gift) =>
-          reservedGifts.includes(gift.id) ? { ...gift, isReserved: true } : gift
-        )
-      )
-    }
-  }, [])
+  // Removed localStorage loading for isReserved
 
   const handleGiftClick = (gift: GiftItem) => {
     setSelectedGift(gift)
@@ -403,17 +393,8 @@ export default function Presentes() {
   }
 
   const handleGiftSuccess = (giftId: string) => {
-    setGifts((prevGifts) =>
-      prevGifts.map((gift) =>
-        gift.id === giftId ? { ...gift, isReserved: true } : gift
-      )
-    )
-
-    // Save to localStorage
-    const reservedGifts = JSON.parse(localStorage.getItem("reservedGifts") || "[]")
-    if (!reservedGifts.includes(giftId)) {
-      localStorage.setItem("reservedGifts", JSON.stringify([...reservedGifts, giftId]))
-    }
+    // Just show success, do not lock the gift.
+    console.log("Gift purchased successfully:", giftId)
   }
 
   return (
@@ -427,7 +408,7 @@ export default function Presentes() {
           href="/"
           className="text-wedding-primary font-cormorant text-lg italic hover:text-wedding-secondary transition-colors border-b border-transparent hover:border-wedding-secondary"
         >
-          &larr; Confirmar presença
+          &larr; Voltar ao site
         </Link>
       </nav>
 
@@ -448,8 +429,13 @@ export default function Presentes() {
       {/* Gifts Grid */}
       <section className="w-full max-w-7xl mx-auto px-4 md:px-6 pb-24 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-          {gifts.map((gift) => (
-            <GiftCard key={gift.id} gift={gift} onGiftClick={handleGiftClick} />
+          {gifts.map((gift, index) => (
+            <GiftCard 
+              key={gift.id} 
+              gift={gift} 
+              onGiftClick={handleGiftClick}
+              priority={index < 4}
+            />
           ))}
         </div>
       </section>
