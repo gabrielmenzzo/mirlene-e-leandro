@@ -4,7 +4,7 @@ import * as React from "react"
 import { Logo } from "@/components/wedding/Logo"
 import { Arabesque } from "@/components/wedding/Arabesque"
 import { CountdownTimer } from "@/components/wedding/CountdownTimer"
-import { RSVPForm } from "@/components/wedding/RSVPForm"
+import { RSVPNote } from "@/components/wedding/RSVPNote"
 import { PolaroidGallery } from "@/components/wedding/PolaroidGallery"
 import { OurStory } from "@/components/wedding/OurStory"
 import { WelcomeOverlay } from "@/components/wedding/WelcomeOverlay"
@@ -86,7 +86,7 @@ export function HomeContent() {
         <section className="w-full px-4 py-20 relative z-10 bg-gradient-to-b from-transparent via-wedding-muted/30 to-transparent">
           <div className="max-w-7xl mx-auto flex flex-col items-center">
             <Arabesque className="mb-12 w-32 rotate-180 opacity-40" />
-            <RSVPForm />
+            <RSVPNote />
             <Arabesque className="mt-16 w-32 opacity-40" />
           </div>
         </section>

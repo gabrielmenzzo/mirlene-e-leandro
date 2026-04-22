@@ -90,7 +90,7 @@ export function GiftModal({ gift, isOpen, onClose, onSuccess }: GiftModalProps) 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md overflow-hidden">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogTitle className="sr-only">Presentear</DialogTitle>
         <AnimatePresence mode="wait">
           {step === "confirm" && (

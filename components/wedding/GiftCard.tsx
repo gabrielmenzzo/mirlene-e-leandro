@@ -21,9 +21,10 @@ export interface GiftItem {
 interface GiftCardProps {
   gift: GiftItem
   onGiftClick: (gift: GiftItem) => void
+  priority?: boolean
 }
 
-export function GiftCard({ gift, onGiftClick }: GiftCardProps) {
+export function GiftCard({ gift, onGiftClick, priority }: GiftCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -33,16 +34,9 @@ export function GiftCard({ gift, onGiftClick }: GiftCardProps) {
       className="h-full"
     >
       <Card className="h-full flex flex-col overflow-hidden group relative border-wedding-secondary/20 hover:border-wedding-primary/50 transition-colors duration-300">
-        {gift.isReserved && (
-          <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center">
-            <div className="bg-wedding-primary text-white px-6 py-3 rounded-full flex items-center gap-2 shadow-lg">
-              <Heart className="w-5 h-5 fill-current" />
-              <span className="font-medium">Presenteado</span>
-            </div>
-          </div>
-        )}
 
-        {gift.badge && !gift.isReserved && (
+
+        {gift.badge && (
           <div className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm text-wedding-primary text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm border border-wedding-primary/20 flex items-center gap-1.5">
             {gift.badge}
           </div>
@@ -53,6 +47,7 @@ export function GiftCard({ gift, onGiftClick }: GiftCardProps) {
             src={gift.imageUrl}
             alt={gift.name}
             fill
+            priority={priority}
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
@@ -77,7 +72,6 @@ export function GiftCard({ gift, onGiftClick }: GiftCardProps) {
           <Button
             className="w-full group/btn cursor-pointer"
             onClick={() => onGiftClick(gift)}
-            disabled={gift.isReserved}
           >
             Presentear
             <Gift className="ml-2 w-4 h-4 group-hover/btn:scale-110 transition-transform" />

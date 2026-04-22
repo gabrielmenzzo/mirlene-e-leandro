@@ -6,6 +6,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { type, data } = body
 
+    const xSignature = request.headers.get("x-signature")
+    const xRequestId = request.headers.get("x-request-id")
+    
+    console.log("Webhook recebido:", { type, xSignature, xRequestId })
+
     if (type !== "payment") {
       return NextResponse.json({ received: true })
     }
