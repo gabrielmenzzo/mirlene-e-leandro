@@ -25,7 +25,7 @@ const lato = Lato({
 
 export const metadata: Metadata = {
   title: 'Mirlene & Leandro | Casamento',
-  description: 'Celebre conosco este momento especial. Confirme sua presença e acesse nossa lista de presentes.',
+  description: 'Celebre conosco este momento especial.  acesse nossa lista de presentes.',
   openGraph: {
     title: 'Mirlene & Leandro | Casamento',
     description: 'Celebre conosco este momento especial.',

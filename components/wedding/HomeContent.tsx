@@ -65,14 +65,27 @@ export function HomeContent() {
             
             <div className="flex-1 flex flex-col items-center gap-3 text-center px-4">
               <MapPin className="w-6 h-6 text-wedding-primary flex-shrink-0" />
-              <a 
-                href="https://maps.app.goo.gl/gHUq1HS8uHat9BDe8" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-base md:text-lg tracking-wide hover:text-wedding-primary transition-colors hover:underline underline-offset-4 font-medium"
-              >
-                Av. Sebastião Jorge Lasmar -<br />Formiga, MG,<br />35570-000
-              </a>
+              <div className="flex flex-col items-center gap-1.5">
+                <h3 className="font-cormorant text-xl md:text-2xl font-semibold text-wedding-secondary leading-tight">
+                  Igreja de Santo Antônio
+                </h3>
+                <span className="font-lato text-sm italic text-wedding-secondary/70 mb-2">
+                  (próximo à Asadef)
+                </span>
+                <a 
+                  href="https://maps.app.goo.gl/gHUq1HS8uHat9BDe8" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group flex flex-col items-center gap-3 transition-all duration-300"
+                >
+                  <span className="text-base md:text-lg tracking-wide group-hover:text-wedding-primary transition-colors font-medium leading-relaxed">
+                    Av. Sebastião Jorge Lasmar -<br />Formiga, MG,<br />35570-000
+                  </span>
+                  <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest bg-wedding-primary/10 text-wedding-primary border border-wedding-primary/30 group-hover:bg-wedding-primary group-hover:text-white group-hover:border-wedding-primary group-hover:shadow-lg group-hover:shadow-wedding-primary/20 transition-all duration-300 transform group-hover:-translate-y-0.5">
+                    Abrir no Google Maps
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
 
