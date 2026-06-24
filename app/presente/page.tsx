@@ -357,8 +357,8 @@ const NEW_GIFTS: GiftItem[] = [
 ]
 
 function interleaveGifts<T extends { price: number }>(arr1: T[], arr2: T[]): T[] {
-  const sorted1 = [...arr1].sort((a, b) => b.price - a.price)
-  const sorted2 = [...arr2].sort((a, b) => b.price - a.price)
+  const sorted1 = [...arr1].sort((a, b) => a.price - b.price)
+  const sorted2 = [...arr2].sort((a, b) => a.price - b.price)
   
   const result: T[] = []
   const maxLen = Math.max(sorted1.length, sorted2.length)

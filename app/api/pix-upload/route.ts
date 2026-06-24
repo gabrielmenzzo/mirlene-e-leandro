@@ -6,17 +6,30 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const senderName = formData.get("senderName") as string;
-    const giftName = formData.get("giftName") as string;
+    const senderNameRaw = formData.get("senderName") as string;
+    const giftNameRaw = formData.get("giftName") as string;
     const giftPrice = formData.get("giftPrice") as string;
     const receiptFile = formData.get("receipt") as File;
 
-    if (!senderName || !receiptFile) {
+    if (!senderNameRaw || !receiptFile) {
       return NextResponse.json(
         { error: "Faltam dados obrigatórios (Nome ou Comprovante)." },
         { status: 400 }
       );
     }
+
+    // Sanitização simples para evitar injeção de HTML no e-mail
+    const escapeHtml = (unsafe: string) => {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
+
+    const senderName = escapeHtml(senderNameRaw);
+    const giftName = escapeHtml(giftNameRaw);
 
     const buffer = Buffer.from(await receiptFile.arrayBuffer());
     
