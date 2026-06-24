@@ -1,10 +1,19 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/utils/rateLimit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    if (!rateLimit(ip, 5, 60000)) {
+      return NextResponse.json(
+        { error: "Muitas requisições. Tente novamente em 1 minuto." },
+        { status: 429 }
+      );
+    }
+
     const { senderName: senderNameRaw, guestMessage: guestMessageRaw, giftName: giftNameRaw, giftPrice, cardPaidPrice } = await request.json();
 
     if (!senderNameRaw) {

@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Erro ao processar pagamento", status_detail: errorDetail, details: error },
+      { error: "Erro ao processar pagamento", status_detail: errorDetail },
       { status: 500 }
     )
   }

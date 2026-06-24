@@ -1,10 +1,22 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/utils/rateLimit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    if (!rateLimit(ip, 5, 60000)) {
+      return NextResponse.json(
+        { error: "Muitas requisições. Tente novamente em 1 minuto." },
+        { status: 429 }
+      );
+    }
+
     const formData = await request.formData();
     const senderNameRaw = formData.get("senderName") as string;
     const guestMessageRaw = formData.get("guestMessage") as string;
@@ -15,6 +27,20 @@ export async function POST(request: Request) {
     if (!senderNameRaw || !receiptFile) {
       return NextResponse.json(
         { error: "Faltam dados obrigatórios (Nome ou Comprovante)." },
+        { status: 400 }
+      );
+    }
+
+    if (receiptFile.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "O comprovante é muito grande. O tamanho máximo permitido é 4MB." },
+        { status: 400 }
+      );
+    }
+
+    if (!ALLOWED_MIME_TYPES.includes(receiptFile.type)) {
+      return NextResponse.json(
+        { error: "Formato de arquivo não suportado. Envie uma imagem ou PDF." },
         { status: 400 }
       );
     }
