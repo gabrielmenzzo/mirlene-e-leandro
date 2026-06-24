@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
-    const { senderName: senderNameRaw, guestMessage: guestMessageRaw, giftName: giftNameRaw, giftPrice } = await request.json();
+    const { senderName: senderNameRaw, guestMessage: guestMessageRaw, giftName: giftNameRaw, giftPrice, cardPaidPrice } = await request.json();
 
     if (!senderNameRaw) {
       return NextResponse.json(
@@ -30,10 +30,15 @@ export async function POST(request: Request) {
     const guestMessage = escapeHtml(guestMessageRaw);
     const giftName = escapeHtml(giftNameRaw);
 
-    const formattedPrice = new Intl.NumberFormat("pt-BR", {
+    const formattedOriginalPrice = new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(Number(giftPrice));
+
+    const formattedPaidPrice = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(Number(cardPaidPrice || giftPrice));
 
     const htmlTemplate = `
       <!DOCTYPE html>
@@ -63,12 +68,20 @@ export async function POST(request: Request) {
                 <h3 style="margin-top: 0; color: #333333; font-size: 18px; margin-bottom: 10px;">Detalhes do Presente</h3>
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
-                    <td style="padding: 5px 0; color: #777777; font-size: 15px;" width="100">Presente:</td>
+                    <td style="padding: 5px 0; color: #777777; font-size: 15px;" width="180">Presente:</td>
                     <td style="padding: 5px 0; color: #333333; font-size: 15px; font-weight: bold;">${giftName}</td>
                   </tr>
                   <tr>
-                    <td style="padding: 5px 0; color: #777777; font-size: 15px;" width="100">Valor:</td>
-                    <td style="padding: 5px 0; color: #C1A78B; font-size: 16px; font-weight: bold;">${formattedPrice}</td>
+                    <td style="padding: 5px 0; color: #777777; font-size: 15px;" width="180">Valor Original:</td>
+                    <td style="padding: 5px 0; color: #777777; font-size: 15px;">${formattedOriginalPrice}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 5px 0; color: #777777; font-size: 15px;" width="180">Pago com Taxa MP:</td>
+                    <td style="padding: 5px 0; color: #777777; font-size: 15px;">${formattedPaidPrice}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0 5px 0; color: #333333; font-size: 16px; font-weight: bold;" width="180">Vocês receberão:</td>
+                    <td style="padding: 10px 0 5px 0; color: #22c55e; font-size: 18px; font-weight: bold;">${formattedOriginalPrice}</td>
                   </tr>
                 </table>
               </div>

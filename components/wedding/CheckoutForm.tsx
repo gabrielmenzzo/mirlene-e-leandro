@@ -30,11 +30,17 @@ export default function CheckoutForm({
   const [createdPaymentId, setCreatedPaymentId] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "card" | null>(null)
 
+  const MP_FEE_14_DAYS = 0.0449; // Taxa Mercado Pago de 4,49% para receber em 14 dias
+
+  const cardPrice = useMemo(() => {
+    return Number((giftPrice / (1 - MP_FEE_14_DAYS)).toFixed(2));
+  }, [giftPrice]);
+
   const paymentInitialization = useMemo(() => {
     return {
-      amount: giftPrice,
+      amount: paymentMethod === "card" ? cardPrice : giftPrice,
     }
-  }, [giftPrice])
+  }, [giftPrice, paymentMethod, cardPrice])
 
   const paymentCustomization = useMemo(() => ({
     visual: {
@@ -170,7 +176,7 @@ export default function CheckoutForm({
             payer: actualFormData.payer,
           },
           giftName,
-          giftPrice,
+          giftPrice: paymentMethod === "card" ? cardPrice : giftPrice,
         }),
       })
 
@@ -195,7 +201,8 @@ export default function CheckoutForm({
               senderName,
               guestMessage,
               giftName,
-              giftPrice
+              giftPrice,
+              cardPaidPrice: paymentMethod === "card" ? cardPrice : giftPrice,
             })
           });
         } catch (emailErr) {
@@ -339,8 +346,8 @@ export default function CheckoutForm({
               <div className="w-12 h-12 bg-wedding-secondary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-wedding-secondary"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
               </div>
-              <span className="font-semibold text-wedding-text">Cartão de Crédito</span>
-              <span className="text-xs text-wedding-secondary">Até 12x</span>
+              <span className="font-semibold text-wedding-text text-center">Cartão de Crédito</span>
+              <span className="text-xs text-wedding-secondary text-center">Até 12x (+ taxa Mercado Pago)</span>
             </button>
           </div>
         </div>
