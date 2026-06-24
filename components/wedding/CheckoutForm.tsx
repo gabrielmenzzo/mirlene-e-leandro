@@ -164,40 +164,48 @@ export default function CheckoutForm({
     }
   }
 
-  const handleFastPix = async () => {
+  const [senderName, setSenderName] = useState("")
+  const [receiptFile, setReceiptFile] = useState<File | null>(null)
+  const [pixCopied, setPixCopied] = useState(false)
+  const pixKey = "37998151185"
+
+  const handleCopyPix = () => {
+    navigator.clipboard.writeText(pixKey)
+    setPixCopied(true)
+    setTimeout(() => setPixCopied(false), 2000)
+  }
+
+  const handleManualPix = async () => {
+    if (!senderName || !receiptFile) {
+      onError("Por favor, preencha seu nome e anexe o comprovante.")
+      return
+    }
+
     setIsProcessing(true)
     
     try {
-      const response = await fetch("/api/pagamento", {
+      const formData = new FormData()
+      formData.append("senderName", senderName)
+      formData.append("giftName", giftName)
+      formData.append("giftPrice", String(giftPrice))
+      formData.append("receipt", receiptFile)
+
+      const response = await fetch("/api/pix-upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          paymentData: {
-            paymentMethodId: "pix",
-            payer: { email: "pix@casamento.com" }, // E-mail genérico para pular formulário
-          },
-          giftName,
-          giftPrice,
-        }),
+        body: formData,
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        let errorData: any = {}
-        try { errorData = JSON.parse(errorText) } catch (e) { }
-        onError(errorData.error || "Erro ao processar pagamento")
+        const errorData = await response.json()
+        onError(errorData.error || "Erro ao enviar comprovante")
         return
       }
 
-      const data: PaymentResult = await response.json()
-      if (data.status === "pending" || data.status === "in_process") {
-        setCreatedPaymentId(String(data.id))
-      } else {
-        onError(data.status_detail || "Falha ao gerar PIX")
-      }
+      // Sucesso no PIX manual
+      onSuccess("pix-manual")
     } catch (err) {
-      console.error("Erro no Fast PIX:", err)
-      onError("Erro ao processar PIX")
+      console.error("Erro no PIX manual:", err)
+      onError("Erro ao processar comprovante. Tente novamente.")
     } finally {
       setIsProcessing(false)
     }
@@ -263,14 +271,14 @@ export default function CheckoutForm({
       {!paymentMethod && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
-            onClick={handleFastPix}
+            onClick={() => setPaymentMethod("pix")}
             className="border-2 border-wedding-primary/20 bg-white hover:border-wedding-primary hover:bg-wedding-primary/5 p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all group"
           >
             <div className="w-12 h-12 bg-wedding-primary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-wedding-primary"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 14v6"/><path d="M4 17v3h16v-3"/><path d="M12 4v4"/><path d="M7 10h10v4H7z"/></svg>
             </div>
-            <span className="font-semibold text-wedding-text">Gerar PIX</span>
-            <span className="text-xs text-wedding-secondary">Aprovação imediata</span>
+            <span className="font-semibold text-wedding-text">Pagar com PIX</span>
+            <span className="text-xs text-wedding-secondary">Sem taxas (Recomendado)</span>
           </button>
 
           <button
@@ -283,6 +291,91 @@ export default function CheckoutForm({
             <span className="font-semibold text-wedding-text">Cartão de Crédito</span>
             <span className="text-xs text-wedding-secondary">Até 12x</span>
           </button>
+        </div>
+      )}
+
+      {paymentMethod === "pix" && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <button
+            onClick={() => setPaymentMethod(null)}
+            className="text-wedding-secondary hover:text-wedding-primary text-sm flex items-center gap-1 mb-2"
+          >
+            ← Trocar método
+          </button>
+          
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-wedding-primary/30 shadow-sm space-y-6">
+            <div className="text-center space-y-2">
+              <h3 className="font-cormorant text-xl font-semibold text-wedding-text">Transferência via PIX</h3>
+              <p className="text-sm text-wedding-secondary">Copie a chave abaixo e faça a transferência no aplicativo do seu banco.</p>
+            </div>
+
+            <div className="bg-wedding-muted/30 p-4 rounded-lg flex flex-col items-center justify-center gap-3 border border-wedding-secondary/10">
+              <span className="text-xs font-semibold uppercase tracking-wider text-wedding-secondary">Chave PIX (Telefone)</span>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl sm:text-3xl font-bold tracking-widest text-wedding-text">{pixKey}</span>
+              </div>
+              <button 
+                onClick={handleCopyPix}
+                className="mt-2 bg-white border border-wedding-primary/30 text-wedding-primary hover:bg-wedding-primary hover:text-white transition-colors px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2"
+              >
+                {pixCopied ? (
+                  <><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copiado!</>
+                ) : (
+                  <><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copiar Chave</>
+                )}
+              </button>
+            </div>
+
+            <div className="space-y-4 pt-2 border-t border-wedding-secondary/10">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-wedding-text">Seu Nome Completo</label>
+                <input 
+                  type="text" 
+                  value={senderName}
+                  onChange={(e) => setSenderName(e.target.value)}
+                  placeholder="Como quer ser lembrado?" 
+                  className="w-full px-4 py-3 rounded-lg border border-wedding-secondary/20 focus:outline-none focus:ring-2 focus:ring-wedding-primary/50 focus:border-wedding-primary transition-all bg-white"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-wedding-text">Comprovante de Pagamento</label>
+                <div className="relative">
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
+                    className="hidden" 
+                    id="receipt-upload"
+                  />
+                  <label 
+                    htmlFor="receipt-upload"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-dashed border-wedding-secondary/30 hover:border-wedding-primary hover:bg-wedding-primary/5 cursor-pointer transition-all bg-white text-wedding-secondary hover:text-wedding-primary"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                    <span className="font-medium truncate max-w-[200px] sm:max-w-full">
+                      {receiptFile ? receiptFile.name : "Anexar Comprovante"}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={handleManualPix}
+              disabled={!senderName || !receiptFile || isProcessing}
+              className="w-full bg-wedding-primary hover:bg-wedding-primary/90 disabled:bg-wedding-secondary/30 disabled:cursor-not-allowed text-white text-lg font-medium py-4 rounded-xl shadow-md transition-all flex justify-center items-center gap-2"
+            >
+              {isProcessing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                "Enviar e Confirmar Presente"
+              )}
+            </button>
+          </div>
         </div>
       )}
 
