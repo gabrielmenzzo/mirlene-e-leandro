@@ -104,10 +104,57 @@ export default function CheckoutForm({
     }
   }, [isReady, giftName, giftPrice, onError])
 
-  const handlePaymentSubmit = async (param: any): Promise<void> => {
+  const [checkoutStep, setCheckoutStep] = useState<"message" | "payment_method">("message")
+  const [senderName, setSenderName] = useState("")
+  const [guestMessage, setGuestMessage] = useState("")
+  const [receiptFile, setReceiptFile] = useState<File | null>(null)
+  const [pixCopied, setPixCopied] = useState(false)
+  const pixKey = "37998151185"
+
+  const handleCopyPix = () => {
+    navigator.clipboard.writeText(pixKey)
+    setPixCopied(true)
+    setTimeout(() => setPixCopied(false), 2000)
+  }
+
+  const handleManualPix = async () => {
+    if (!receiptFile) {
+      onError("Por favor, anexe o comprovante.")
+      return
+    }
+
     setIsProcessing(true)
     
-    // O Payment Brick do Mercado Pago envia um objeto com { selectedPaymentMethod, formData }
+    try {
+      const formData = new FormData()
+      formData.append("senderName", senderName)
+      formData.append("guestMessage", guestMessage)
+      formData.append("giftName", giftName)
+      formData.append("giftPrice", String(giftPrice))
+      formData.append("receipt", receiptFile)
+
+      const response = await fetch("/api/pix-upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        onError(errorData.error || "Erro ao enviar comprovante")
+        return
+      }
+
+      onSuccess("pix-manual")
+    } catch (err) {
+      console.error("Erro no PIX manual:", err)
+      onError("Erro ao processar comprovante. Tente novamente.")
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handlePaymentSubmit = async (param: any): Promise<void> => {
+    setIsProcessing(true)
     const actualFormData = param.formData || param
     
     try {
@@ -130,27 +177,38 @@ export default function CheckoutForm({
       if (!response.ok) {
         const errorText = await response.text()
         let errorData: any = {}
-        try {
-          errorData = JSON.parse(errorText)
-        } catch (e) {
-          console.error("Não foi possível parsear o erro como JSON:", errorText)
-        }
-        console.error("Erro na API pagamento:", errorData, "Status:", response.status, "Raw:", errorText)
+        try { errorData = JSON.parse(errorText) } catch (e) { }
         onError(errorData.error || "Erro ao processar pagamento")
         throw new Error(errorData.error || "Erro ao processar pagamento")
       }
 
       const data: PaymentResult = await response.json()
-      console.log("Payment response:", data)
-
+      
       if (data.status === "approved" || data.status === "pending" || data.status === "in_process") {
+        
+        // Enviar o e-mail em background se for aprovado (Cartão de Crédito)
+        try {
+          await fetch("/api/card-message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              senderName,
+              guestMessage,
+              giftName,
+              giftPrice
+            })
+          });
+        } catch (emailErr) {
+          console.error("Erro ao enviar e-mail de mensagem do cartão", emailErr);
+          // Nao bloqueia o fluxo
+        }
+
         if (data.status === "approved") {
           setTimeout(() => onSuccess(String(data.id)), 3000)
-        } else if (data.status === "pending" || data.status === "in_process") {
+        } else {
           setCreatedPaymentId(String(data.id))
         }
-        return // Resolve promise para o Brick
-
+        return
       } else {
         onError(data.status_detail || "Pagamento não aprovado")
         throw new Error("Pagamento não aprovado")
@@ -159,53 +217,6 @@ export default function CheckoutForm({
       console.error("Erro no pagamento:", err)
       onError("Erro ao processar pagamento")
       throw err
-    } finally {
-      setIsProcessing(false)
-    }
-  }
-
-  const [senderName, setSenderName] = useState("")
-  const [receiptFile, setReceiptFile] = useState<File | null>(null)
-  const [pixCopied, setPixCopied] = useState(false)
-  const pixKey = "37998151185"
-
-  const handleCopyPix = () => {
-    navigator.clipboard.writeText(pixKey)
-    setPixCopied(true)
-    setTimeout(() => setPixCopied(false), 2000)
-  }
-
-  const handleManualPix = async () => {
-    if (!senderName || !receiptFile) {
-      onError("Por favor, preencha seu nome e anexe o comprovante.")
-      return
-    }
-
-    setIsProcessing(true)
-    
-    try {
-      const formData = new FormData()
-      formData.append("senderName", senderName)
-      formData.append("giftName", giftName)
-      formData.append("giftPrice", String(giftPrice))
-      formData.append("receipt", receiptFile)
-
-      const response = await fetch("/api/pix-upload", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        onError(errorData.error || "Erro ao enviar comprovante")
-        return
-      }
-
-      // Sucesso no PIX manual
-      onSuccess("pix-manual")
-    } catch (err) {
-      console.error("Erro no PIX manual:", err)
-      onError("Erro ao processar comprovante. Tente novamente.")
     } finally {
       setIsProcessing(false)
     }
@@ -240,9 +251,7 @@ export default function CheckoutForm({
         </button>
         <div className="bg-white rounded-lg p-4 border border-wedding-secondary/20">
           <StatusScreen
-            initialization={{
-              paymentId: createdPaymentId,
-            }}
+            initialization={{ paymentId: createdPaymentId }}
             onReady={() => console.log("StatusScreen ready")}
             onError={(error: unknown) => console.error("StatusScreen error", error)}
           />
@@ -254,7 +263,7 @@ export default function CheckoutForm({
   return (
     <div className="space-y-4">
       <button
-        onClick={onBack}
+        onClick={checkoutStep === "payment_method" ? () => setCheckoutStep("message") : onBack}
         className="text-wedding-secondary hover:text-wedding-primary transition-colors text-sm flex items-center gap-1 cursor-pointer"
       >
         ← Voltar
@@ -268,32 +277,76 @@ export default function CheckoutForm({
         </p>
       </div>
 
-      {!paymentMethod && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            onClick={() => setPaymentMethod("pix")}
-            className="border-2 border-wedding-primary/20 bg-white hover:border-wedding-primary hover:bg-wedding-primary/5 p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all group"
-          >
-            <div className="w-12 h-12 bg-wedding-primary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-wedding-primary"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 14v6"/><path d="M4 17v3h16v-3"/><path d="M12 4v4"/><path d="M7 10h10v4H7z"/></svg>
+      {checkoutStep === "message" && (
+        <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="space-y-2">
+            <h3 className="font-cormorant text-2xl font-semibold text-wedding-text text-center">Deixe seu carinho</h3>
+            <p className="text-sm text-wedding-secondary text-center">Os noivos adorarão ler sua mensagem junto com o presente!</p>
+          </div>
+          
+          <div className="space-y-4 bg-white p-5 rounded-xl border border-wedding-secondary/20 shadow-sm">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-wedding-text">Seu Nome / Nome do Casal *</label>
+              <input 
+                type="text" 
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value)}
+                placeholder="Como quer ser lembrado(a)?" 
+                className="w-full px-4 py-3 rounded-lg border border-wedding-secondary/20 focus:outline-none focus:ring-2 focus:ring-wedding-primary/50 focus:border-wedding-primary transition-all bg-white"
+              />
             </div>
-            <span className="font-semibold text-wedding-text">Pagar com PIX</span>
-          </button>
+
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-wedding-text">Mensagem aos Noivos *</label>
+              <textarea 
+                value={guestMessage}
+                onChange={(e) => setGuestMessage(e.target.value)}
+                placeholder="Escreva algumas palavras para o casal..." 
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg border border-wedding-secondary/20 focus:outline-none focus:ring-2 focus:ring-wedding-primary/50 focus:border-wedding-primary transition-all bg-white resize-none"
+              />
+            </div>
+          </div>
 
           <button
-            onClick={() => setPaymentMethod("card")}
-            className="border-2 border-wedding-secondary/20 bg-white hover:border-wedding-secondary hover:bg-wedding-secondary/5 p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all group"
+            onClick={() => setCheckoutStep("payment_method")}
+            disabled={!senderName.trim() || !guestMessage.trim()}
+            className="w-full bg-wedding-primary hover:bg-wedding-primary/90 disabled:bg-wedding-secondary/30 disabled:cursor-not-allowed text-white text-lg font-medium py-4 rounded-xl shadow-md transition-all flex justify-center items-center"
           >
-            <div className="w-12 h-12 bg-wedding-secondary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-wedding-secondary"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-            </div>
-            <span className="font-semibold text-wedding-text">Cartão de Crédito</span>
-            <span className="text-xs text-wedding-secondary">Até 12x</span>
+            Continuar para Pagamento
           </button>
         </div>
       )}
 
-      {paymentMethod === "pix" && (
+      {checkoutStep === "payment_method" && !paymentMethod && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+          <h3 className="font-cormorant text-xl font-semibold text-wedding-text text-center mb-4">Como deseja pagar?</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button
+              onClick={() => setPaymentMethod("pix")}
+              className="border-2 border-wedding-primary/20 bg-white hover:border-wedding-primary hover:bg-wedding-primary/5 p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all group"
+            >
+              <div className="w-12 h-12 bg-wedding-primary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-wedding-primary"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 14v6"/><path d="M4 17v3h16v-3"/><path d="M12 4v4"/><path d="M7 10h10v4H7z"/></svg>
+              </div>
+              <span className="font-semibold text-wedding-text">Pagar com PIX</span>
+            </button>
+
+            <button
+              onClick={() => setPaymentMethod("card")}
+              className="border-2 border-wedding-secondary/20 bg-white hover:border-wedding-secondary hover:bg-wedding-secondary/5 p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all group"
+            >
+              <div className="w-12 h-12 bg-wedding-secondary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-wedding-secondary"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              </div>
+              <span className="font-semibold text-wedding-text">Cartão de Crédito</span>
+              <span className="text-xs text-wedding-secondary">Até 12x</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {checkoutStep === "payment_method" && paymentMethod === "pix" && (
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
           <button
             onClick={() => setPaymentMethod(null)}
@@ -327,17 +380,6 @@ export default function CheckoutForm({
 
             <div className="space-y-4 pt-2 border-t border-wedding-secondary/10">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-wedding-text">Seu Nome Completo</label>
-                <input 
-                  type="text" 
-                  value={senderName}
-                  onChange={(e) => setSenderName(e.target.value)}
-                  placeholder="Como quer ser lembrado?" 
-                  className="w-full px-4 py-3 rounded-lg border border-wedding-secondary/20 focus:outline-none focus:ring-2 focus:ring-wedding-primary/50 focus:border-wedding-primary transition-all bg-white"
-                />
-              </div>
-
-              <div className="space-y-1.5">
                 <label className="text-sm font-medium text-wedding-text">Comprovante de Pagamento</label>
                 <div className="relative">
                   <input 
@@ -362,7 +404,7 @@ export default function CheckoutForm({
 
             <button
               onClick={handleManualPix}
-              disabled={!senderName || !receiptFile || isProcessing}
+              disabled={!receiptFile || isProcessing}
               className="w-full bg-wedding-primary hover:bg-wedding-primary/90 disabled:bg-wedding-secondary/30 disabled:cursor-not-allowed text-white text-lg font-medium py-4 rounded-xl shadow-md transition-all flex justify-center items-center gap-2"
             >
               {isProcessing ? (
@@ -378,7 +420,7 @@ export default function CheckoutForm({
         </div>
       )}
 
-      {paymentMethod === "card" && (
+      {checkoutStep === "payment_method" && paymentMethod === "card" && (
         <div className="space-y-4">
           <button
             onClick={() => setPaymentMethod(null)}
