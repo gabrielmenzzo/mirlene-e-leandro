@@ -49,6 +49,7 @@ export default function CheckoutForm({
       },
     },
     paymentMethods: {
+      maxInstallments: 12,
       creditCard: ["master", "visa", "elo", "amex"] as any,
     },
   }), [])
@@ -280,7 +281,7 @@ export default function CheckoutForm({
         <p className="text-sm text-wedding-secondary">Presentear com:</p>
         <p className="font-cormorant text-lg font-semibold text-wedding-text">{giftName}</p>
         <p className="text-xl font-medium text-wedding-primary">
-          {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(giftPrice)}
+          {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(paymentMethod === "card" ? cardPrice : giftPrice)}
         </p>
       </div>
 
