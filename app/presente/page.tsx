@@ -268,7 +268,7 @@ const NEW_GIFTS: GiftItem[] = [
     name: "🍿 Pipoca para nossas noites de série",
     description: "O acompanhamento perfeito para maratonas.",
     price: 80.0,
-    imageUrl: "/images/gifts/pipoca.webp",
+    imageUrl: "/images/gifts/pipoca_nova.png",
   },
   {
     id: "ng5",
