@@ -121,6 +121,22 @@ export default function CheckoutForm({
             const data = await res.json()
             if (data.status === "approved") {
               clearInterval(interval)
+              
+              try {
+                await fetch("/api/pix-message", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    senderName,
+                    guestMessage,
+                    giftName,
+                    giftPrice,
+                  })
+                });
+              } catch (emailErr) {
+                console.error("Erro ao enviar e-mail PIX pelo frontend", emailErr);
+              }
+
               setTimeout(() => onSuccess(createdPaymentId), 2000)
             }
           }

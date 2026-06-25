@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import crypto from "crypto"
+import { Resend } from "resend"
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,7 +57,6 @@ export async function POST(request: NextRequest) {
       const giftName = payment.metadata?.gift_name || payment.description;
       
       if (senderName) {
-        const { Resend } = require("resend");
         const resend = new Resend(process.env.RESEND_API_KEY);
         
         const formattedPrice = new Intl.NumberFormat("pt-BR", {

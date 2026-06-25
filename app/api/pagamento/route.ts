@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
         ...(paymentData.payer || {})
       },
       metadata: body.metadata || {},
+      notification_url: "https://mirleneeleandro.com.br/api/webhook",
     }
 
     if (paymentMethodId && typeof paymentMethodId === "string") {
