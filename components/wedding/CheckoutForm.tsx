@@ -111,6 +111,29 @@ export default function CheckoutForm({
     }
   }, [isReady, giftName, giftPrice, onError])
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+    if (createdPaymentId && paymentMethod === "pix") {
+      interval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/pagamento/status?id=${createdPaymentId}`)
+          if (res.ok) {
+            const data = await res.json()
+            if (data.status === "approved") {
+              clearInterval(interval)
+              setTimeout(() => onSuccess(createdPaymentId), 2000)
+            }
+          }
+        } catch (e) {
+          console.error("Polling error", e)
+        }
+      }, 5000)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [createdPaymentId, paymentMethod, onSuccess])
+
   const [checkoutStep, setCheckoutStep] = useState<"message" | "payment_method">("message")
   const [senderName, setSenderName] = useState("")
   const [guestMessage, setGuestMessage] = useState("")
