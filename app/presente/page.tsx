@@ -14,6 +14,14 @@ const GiftModal = dynamic(() => import("@/components/wedding/GiftModal").then(mo
 
 const ORIGINAL_GIFTS: GiftItem[] = [
   {
+    id: "g_teste",
+    name: "🎁 Teste de PIX (R$ 1,00)",
+    description: "Item de teste para verificar se o PIX automático está funcionando 100%.",
+    price: 1.0,
+    imageUrl: "/images/gifts/chocolate.webp",
+    badge: "Teste do Sistema 🛠️",
+  },
+  {
     id: "g1",
     name: "Smart TV 43\"",
     description: "Para nossas maratonas de séries e filmes.",
