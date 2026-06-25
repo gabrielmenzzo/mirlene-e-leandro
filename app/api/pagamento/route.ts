@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
         email: payerEmail || "guest@example.com",
         ...(paymentData.payer || {})
       },
+      metadata: body.metadata || {},
     }
 
     if (paymentMethodId && typeof paymentMethodId === "string") {
