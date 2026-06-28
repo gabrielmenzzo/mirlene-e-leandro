@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
 
         try {
           await resend.emails.send({
-            from: "Lista de Casamento <onboarding@resend.dev>", 
+            from: "Mirlene e Leandro <no-reply@mirleneeleandro.com.br>", 
             to: ["mijmsilva@hotmail.com"],
             subject: `🎉 Novo Presente PIX de ${senderName}: ${giftName}`,
             html: htmlTemplate,

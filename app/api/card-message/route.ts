@@ -117,7 +117,7 @@ export async function POST(request: Request) {
     `;
 
     const { data, error } = await resend.emails.send({
-      from: "Lista de Casamento <onboarding@resend.dev>", 
+      from: "Mirlene e Leandro <no-reply@mirleneeleandro.com.br>", 
       to: ["mijmsilva@hotmail.com"],
       subject: `🎉 Novo Presente (Cartão) de ${senderName}: ${giftName}`,
       html: htmlTemplate,
